@@ -16,11 +16,14 @@ namespace urloader
         curl_global_cleanup();
     }
 
-    size_t Urloader::WriteCallback(void *ptr, size_t size, size_t nmemb, void *data)
+    size_t Urloader::WriteToRAMCallback(char* current_chunk_of_data, size_t multiplier_size,
+                                        size_t chunk_size, std::string* big_storage)
     {
-        (void)ptr;  /* unused */
-        (void)data; /* unused */
-        return (size_t)(size * nmemb);
+        if(big_storage == NULL){
+            return 0;
+        }
+        big_storage->append(current_chunk_of_data, (multiplier_size * chunk_size));
+        return multiplier_size*chunk_size;
     }
 
     /* Convert std::string to char*. Create vector<char> c_url. And will use it as &c_url[0]*/
@@ -32,24 +35,33 @@ namespace urloader
         return c_url;
     }
 
-    /* Get vector of string in RAM from URL; Input: HTTP URL of file; Output: file in buffer as a vector of string */
-    bool Urloader::GetFileByUrl(std::string& url_of_file, std::string& s_buffer){
-        bool bResult = true;
+    /* Get string in RAM from URL; Input: HTTP URL of file; Output: file in buffer as a string */
+    bool Urloader::GetManifestByUrl(std::string& url_of_file, std::string& buffer){
+
         std::vector<char> c_url = FillUrlfromString(url_of_file);
 
         /* specify URL to get */
         curl_easy_setopt(curl_handle, CURLOPT_URL, &c_url[0]);
 
-        /* send all data to this function  */
-        curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, Urloader::WriteCallback);
-
         /* save data to this buffer */
-        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &s_buffer);
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &buffer);
+
+        /* send all data to this function  */
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, Urloader::WriteToRAMCallback);
+
+        /* some servers don't like requests that are made without a user-agent
+             field, so we provide one */
+        curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 
         /* get it! */
         curl_res = curl_easy_perform(curl_handle);
+        /* transmission done */
         curl_easy_reset(curl_handle);
-        return bResult;
+        if(curl_res != CURLE_OK){
+            return false;
+        }else{
+            return true;
+        }
     }
 
     /* Return True if remote resource exist and accessible */

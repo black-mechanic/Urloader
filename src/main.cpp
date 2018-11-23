@@ -14,9 +14,8 @@ using namespace urloader;
 
 int main(void)
 {
-    string mnf_url = "http://www.olinchuk.ru/manifest/manifest_clarion.json";
-//"file_1M.bin";
-    string ota_url = "http://www.olinchuk.ru";
+    string manifest_url = "http://www.olinchuk.ru/manifest/upgrade.json";
+    string buffer_for_manifest;
     Urloader myUrldr;
     cout << "-------------------------------------------------" << endl;
 
@@ -24,9 +23,12 @@ int main(void)
     time_t t = time(NULL);
     cout << "Start time: " << ctime(&t) << endl;
 
-    if(myUrldr.IsUrlAccessible(ota_url)){
+    if(myUrldr.IsUrlAccessible(manifest_url)){
         //myUrldr
         cout << " URL Exist! " << endl;
+        myUrldr.GetManifestByUrl(manifest_url, buffer_for_manifest);
+        cout << buffer_for_manifest << endl;
+
     }else{
         cout << " Can't connect to URL! " << endl;
     }
