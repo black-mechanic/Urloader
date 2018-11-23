@@ -15,7 +15,7 @@ namespace urloader
 
         bool IsUrlAccessible(std::string& url_of_file);
         bool GetManifestByUrl(std::string& url_of_file, std::string& buffer);
-        bool GetFileByUrl(std::string& url_of_file, std::string& s_buffer);
+        bool GetFileByUrl(std::string& url_of_file, std::string& path_to_file);
 
         CURLcode curl_res;
 
