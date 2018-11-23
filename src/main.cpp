@@ -32,8 +32,9 @@ int main(void)
         cout << buffer_for_manifest << endl;
         /* Parse manifest and get URL for firmware file. Not implemented. */
         string firmware_url = "http://www.olinchuk.ru/firmware/upgrade.bin";
-
-
+        string path_to_file = "d_upgrade.bin";
+        /* Download file from firmware_url and save it to path_to_file */
+        myUrldr.GetFileByUrl(firmware_url, path_to_file);
     }else{
         cout << " Can't connect to URL! " << endl;
     }

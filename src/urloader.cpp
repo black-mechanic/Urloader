@@ -31,6 +31,7 @@ namespace urloader
         if(big_storage == NULL){
             return 0;
         }
+        big_storage->write(current_chunk_of_data, multiplier_size * chunk_size);
         //big_storage->append(current_chunk_of_data, (multiplier_size * chunk_size));
         return multiplier_size*chunk_size;
     }
@@ -97,7 +98,7 @@ namespace urloader
         /* specify URL to get */
         curl_easy_setopt(curl_handler, CURLOPT_URL, &c_url[0]);
 
-        std:fstream file_handler;
+        std::fstream file_handler;
         file_handler.open(path_to_file, std::fstream::out       |
                                         std::fstream::binary    |
                                         std::fstream::trunc);
