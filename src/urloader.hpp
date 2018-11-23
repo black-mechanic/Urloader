@@ -4,6 +4,7 @@
 #include <curl/curl.h>
 #include <string>
 #include <vector>
+#include <fstream>
 
 namespace urloader
 {
@@ -24,8 +25,10 @@ namespace urloader
         std::vector<char> FillUrlfromString(std::string& url_of_file);
         static size_t WriteToRAMCallback(char *current_chunk_of_data, size_t multiplier_size,
                                          size_t chunk_size, std::string* big_storage);
+        static size_t WriteToFileCallback(char* current_chunk_of_data, size_t multiplier_size,
+                                                    size_t chunk_size, std::fstream* big_file);
 
-        CURL *curl_handle;
+        CURL *curl_handler;
 
     };
 }
