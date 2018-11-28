@@ -9,13 +9,13 @@
 using namespace std;
 using namespace urloader;
 
-#define FIRMWARE_UPGRADE "1.1"
+
 
 
 int main(void)
 {
     string manifest_url = "http://www.olinchuk.ru/manifest/upgrade.json";
-    string buffer_for_manifest;
+    vector<uint8_t> buffer_for_manifest;
     Urloader myUrldr;
     cout << "-------------------------------------------------" << endl;
 
@@ -29,7 +29,11 @@ int main(void)
         cout << " URL Exist! " << endl;
         /* Get manifest as a std::string */
         myUrldr.GetManifestByUrl(manifest_url, buffer_for_manifest);
-        cout << buffer_for_manifest << endl;
+        for(auto ch: buffer_for_manifest){
+            cout << ch;
+        }
+        cout << endl;
+
         /* Parse manifest and get URL for firmware file. Not implemented. */
         string firmware_url = "http://www.olinchuk.ru/firmware/upgrade.bin";
         string path_to_file = "d_upgrade.bin";

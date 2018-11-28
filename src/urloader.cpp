@@ -18,12 +18,16 @@ namespace urloader
     }
 // -----------* Callbacks *----------------------------------------
     size_t Urloader::WriteToRAMCallback(char* current_chunk_of_data, size_t multiplier_size,
-                                        size_t chunk_size, std::string* big_storage) {
+                                        size_t chunk_size, std::vector<uint8_t>* big_storage) {
+        int bytes_in_chunk = multiplier_size * chunk_size;
         if(big_storage == NULL){
             return 0;
         }
-        big_storage->append(current_chunk_of_data, (multiplier_size * chunk_size));
-        return multiplier_size*chunk_size;
+        for(int i = 0; i< bytes_in_chunk; i++){
+            big_storage->push_back(current_chunk_of_data[i]);
+        }
+        //append(current_chunk_of_data, (bytes_in_chunk));
+        return bytes_in_chunk;
     }
 
     size_t Urloader::WriteToFileCallback(char* current_chunk_of_data, size_t multiplier_size,
@@ -37,7 +41,7 @@ namespace urloader
     }
 // -----------* Helpers *------------------------------------------
     /* Convert std::string to char*. Create vector<char> c_url. And will use it as &c_url[0]*/
-    std::vector<char> Urloader::FillUrlfromString(std::string& url_of_file){
+    std::vector<char> Urloader::FillUrlfromString(const std::string& url_of_file){
         //std::vector<char> c_url;
         std::vector<char> c_url(url_of_file.begin(), url_of_file.end());
         //c_url = (url_of_file.begin(), url_of_file.end());
@@ -46,7 +50,7 @@ namespace urloader
     }
 // -----------* Main functions *------------------------------------
     /* Return True if remote resource exist and accessible */
-    bool Urloader::IsUrlAccessible(std::string& url_of_file){
+    bool Urloader::IsUrlAccessible(const std::string& url_of_file){
         std::vector<char> c_url = FillUrlfromString(url_of_file);
         curl_easy_setopt(curl_handler, CURLOPT_URL, &c_url[0]);
         /* Now specify the HEAD method */
@@ -63,7 +67,7 @@ namespace urloader
     }
 
     /* Get string in RAM from URL; Input: HTTP URL of file; Output: file in buffer as a string */
-    bool Urloader::GetManifestByUrl(std::string& url_of_file, std::string& buffer){
+    bool Urloader::GetManifestByUrl(const std::string& url_of_file, std::vector<uint8_t>& buffer){
 
         std::vector<char> c_url = FillUrlfromString(url_of_file);
 
@@ -91,7 +95,7 @@ namespace urloader
         }
     }
 
-    bool Urloader::GetFileByUrl(std::string& url_of_file, std::string& path_to_file){
+    bool Urloader::GetFileByUrl(const std::string& url_of_file, const std::string& path_to_file){
 
         std::vector<char> c_url = FillUrlfromString(url_of_file);
 
