@@ -3,7 +3,12 @@
 
 namespace urloader
 {
-    Urloader::Urloader(){
+    struct Urloader::Impl{
+        CURL *curl_handler;
+    }
+
+
+    Urloader::Urloader() : mImpl(new Impl){
         /* init libcurl */
         curl_global_init(CURL_GLOBAL_ALL);
         /* init the curl session */
