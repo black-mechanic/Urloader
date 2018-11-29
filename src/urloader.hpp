@@ -14,7 +14,7 @@ namespace urloader
         ~Urloader();
 
         bool IsUrlAccessible(const std::string& url_of_file);
-        bool GetManifestByUrl(const std::string& url_of_file, std::vector<uint8_t>& buffer  );
+        bool GetManifestByUrl(const std::string& url_of_file, std::vector<uint8_t>& buffer);
         bool GetFileByUrl(const std::string& url_of_file, const std::string& path_to_file);
         uint32_t GetLastResultCode(void);
 

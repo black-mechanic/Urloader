@@ -36,6 +36,7 @@ namespace urloader
 
         CURL *curl_handler;
         CURLcode curl_res;
+        uint32_t size_of_manifest;
 
     };
 
@@ -45,6 +46,7 @@ namespace urloader
         curl_global_init(CURL_GLOBAL_ALL);
         /* init the curl session */
         mImpl->curl_handler = curl_easy_init();
+        mImpl->size_of_manifest = 0;
     }
 
     Urloader::~Urloader(){
@@ -54,10 +56,6 @@ namespace urloader
         curl_global_cleanup();
     }
 
-
-
-
-// -----------* Main functions *------------------------------------
     /* Return True if remote resource exist and accessible */
     bool Urloader::IsUrlAccessible(const std::string& url_of_file){
         std::vector<char> c_url = mImpl->FillUrlfromString(url_of_file);
@@ -66,6 +64,13 @@ namespace urloader
         curl_easy_setopt(mImpl->curl_handler, CURLOPT_NOBODY, 1L);
         /* Perform the request, res will get the return code */
         mImpl->curl_res = curl_easy_perform(mImpl->curl_handler);
+ // Get size of remote file
+        curl_off_t content_length;
+        mImpl->curl_res = curl_easy_getinfo(mImpl->curl_handler, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &content_length);
+        if(content_length != 0){
+            mImpl->size_of_manifest = static_cast<uint32_t>(content_length);
+        }
+
         curl_easy_reset(mImpl->curl_handler);
         /* Check for errors */
         if(mImpl->curl_res != CURLE_OK){
@@ -76,7 +81,8 @@ namespace urloader
     }
 
     /* Get string in RAM from URL; Input: HTTP URL of file; Output: file in buffer as a string */
-    bool Urloader::GetManifestByUrl(const std::string& url_of_file, std::vector<uint8_t>& buffer){
+    bool Urloader::GetManifestByUrl(const std::string& url_of_file,
+                                    std::vector<uint8_t>& buffer){
 
         std::vector<char> c_url = mImpl->FillUrlfromString(url_of_file);
 
@@ -84,6 +90,9 @@ namespace urloader
         curl_easy_setopt(mImpl->curl_handler, CURLOPT_URL, &c_url[0]);
 
         /* save data to this buffer */
+        if(mImpl->size_of_manifest != 0){
+            buffer.resize(mImpl->size_of_manifest + 128);
+        }
         curl_easy_setopt(mImpl->curl_handler, CURLOPT_WRITEDATA, &buffer);
 
         /* send all data to this function  */
@@ -97,6 +106,7 @@ namespace urloader
         /* get it! */
         mImpl->curl_res = curl_easy_perform(mImpl->curl_handler);
         /* transmission done */
+
         curl_easy_reset(mImpl->curl_handler);
         if(mImpl->curl_res != CURLE_OK){
             return false;

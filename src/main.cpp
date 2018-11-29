@@ -25,7 +25,7 @@ int main(void)
 
     /* Check URL accessibility */
     if(myUrldr.IsUrlAccessible(manifest_url)){
-        //myUrldr
+
         cout << " URL Exist! " << endl;
         /* Get manifest as a std::string */
         myUrldr.GetManifestByUrl(manifest_url, buffer_for_manifest);
