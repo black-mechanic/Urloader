@@ -47,6 +47,8 @@ namespace urloader
         /* init the curl session */
         mImpl->curl_handler = curl_easy_init();
         mImpl->size_of_manifest = 0;
+        progress_indicator.is_download_completed = true;
+        progress_indicator.pProgressCallback = nullptr;
     }
 
     Urloader::~Urloader(){
@@ -103,11 +105,21 @@ namespace urloader
              field, so we provide one */
         curl_easy_setopt(mImpl->curl_handler, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 
+        if(progress_indicator.pProgressCallback != nullptr){
+            progress_indicator.is_download_completed = false;
+            progress_indicator.received_file_size = 0;
+        }
+
         /* get it! */
         mImpl->curl_res = curl_easy_perform(mImpl->curl_handler);
         /* transmission done */
-
         curl_easy_reset(mImpl->curl_handler);
+
+        if(progress_indicator.pProgressCallback != nullptr){
+            progress_indicator.is_download_completed = true;
+            (void*)progress_indicator.pProgressCallback();
+        }
+
         if(mImpl->curl_res != CURLE_OK){
             return false;
         }else{
